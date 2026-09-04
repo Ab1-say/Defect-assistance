@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DefectFlow · 研发缺陷协作看板</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path>
+          <path d="M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"></path>
+        </svg>
+      </span>
+      <div>
+        <strong>DefectFlow</strong>
+        <span class="topbar-sub">研发缺陷协作</span>
+      </div>
+    </div>
+    <div class="user-picker">
+      <label for="userSelect">以什么身份协作？</label>
+      <select id="userSelect" aria-label="选择当前身份"></select>
+      <span id="roleHint" class="role-hint"></span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="toolbar">
+      <div>
+        <h1>缺陷看板</h1>
+        <p id="boardSummary" class="muted">加载中…</p>
+      </div>
+      <button id="newBugBtn" type="button" class="btn btn-primary" hidden>提交新缺陷</button>
+    </section>
+
+    <section class="legend muted">
+      <span>流转顺序：</span>
+      <span class="legend-item">待确认</span><span class="arrow">→</span>
+      <span class="legend-item">待处理</span><span class="arrow">→</span>
+      <span class="legend-item">处理中</span><span class="arrow">→</span>
+      <span class="legend-item">待验证</span><span class="arrow">→</span>
+      <span class="legend-item">已关闭</span>
+      <span class="legend-note">（产品可延期/驳回；验证失败会自动回到“待处理”并触发重开）</span>
+    </section>
+
+    <section id="board" aria-label="缺陷状态看板"></section>
+  </main>
+
+  <!-- 新建缺陷弹窗 -->
+  <div class="overlay" id="newBugOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="newBugTitle">
+      <div class="modal-header">
+        <h2 id="newBugTitle">提交新缺陷</h2>
+        <button type="button" class="icon-btn" data-close="newBugOverlay" aria-label="关闭">×</button>
+      </div>
+      <form id="newBugForm">
+        <label class="field">
+          <span>标题 <em>*</em></span>
+          <input name="title" type="text" maxlength="120" required placeholder="一句话说明问题，例如：订单导出超过 5 万行时接口超时">
+        </label>
+        <div class="form-row">
+          <label class="field">
+            <span>严重程度 <em>*</em></span>
+            <select name="severity" required>
+              <option value="S1">S1 · 致命</option>
+              <option value="S2" selected>S2 · 严重</option>
+              <option value="S3">S3 · 一般</option>
+              <option value="S4">S4 · 轻微</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>所属模块</span>
+            <input name="module" type="text" placeholder="例如：订单中心">
+          </label>
+        </div>
+        <label class="field">
+          <span>期望指派的开发（可选）</span>
+          <select name="assignee_id">
+            <option value="">先不指派，由产品在确认时分配</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>复现步骤 / 补充说明</span>
+          <textarea name="description" rows="4" placeholder="包括环境、前置条件、操作步骤、预期与实际结果"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn" data-close="newBugOverlay">取消</button>
+          <button type="submit" class="btn btn-primary">提交缺陷</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 缺陷详情抽屉 -->
+  <aside class="drawer" id="detailDrawer" hidden aria-label="缺陷详情">
+    <div class="drawer-head" id="detailHead"></div>
+    <div class="drawer-body" id="detailBody"></div>
+  </aside>
+
+  <div class="toast" id="toast" role="alert" hidden></div>
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
